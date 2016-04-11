@@ -71,7 +71,7 @@ function sendBoard() {
     for (var j = 0; j < 8; ++j) {
       if (board[i][j]) {
         if (t) {
-          c.push(t);
+          c.push(t); 
           t = 0;
         }
         c.push(side[i][j] ? board[i][j].toLowerCase() : board[i][j]);
@@ -88,7 +88,23 @@ function sendBoard() {
 
 function parseMove(m) {
   /* this is a basic variant, no checking yet */
-  a, b = m.split(' ');
+  var a, b;
+  [a, b] = m.split(' ');
+  try {
+    x = function(s) { return s.charCodeAt(0) - 'a'.charCodeAt(0) }
+    var a1 = 8 - parseInt(a[1]);
+    var a2 = x(a[0]);
+    var b1 = 8 - parseInt(b[1]);
+    var b2 = x(b[0]);
+    board[b1][b2] = board[a1][a2];
+    side[b1][b2] = side[a1][a2];
+    board[a1][a2] = '';
+    side[a1][a2] = -1;
+  }
+  catch (err) {
+    console.error(err);
+    return false;
+  }
   return true;
 }
 
