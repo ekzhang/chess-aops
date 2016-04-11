@@ -1,6 +1,7 @@
 'use strict';
 var ROOM_ID = 971;
-var opponent = 'eygmath';
+var white = 'fz0718';
+var black = 'eygmath';
 
 function sendFEN(s) {
   x = 'http://www.gilith.com/chess/diagrams/?f=' + s.replace(/\//g, '%2F') + '&s=create';
