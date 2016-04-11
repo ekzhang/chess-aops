@@ -22,6 +22,7 @@ var black;
 var turn;
 var board;
 var side;
+var playing;
 
 var q = [];
 var w = App.getWindow(ROOM_ID);
@@ -33,6 +34,25 @@ w.doInput = function doInput(s) {
 setInterval(function() {
   if (q.length > 0) _doInput(q.shift());
 }, 1100);
+
+var _onPluginMessage = Classroom.socket.onPluginMessage;
+Classroom.socket.onPluginMessage = function(payload) {
+  if (playing) {
+    if (payload.message && payload.message.startsWith('@chess')) {
+      if ((payload.speaker === white && turn === 0) ||
+          (payload.speaker === black && turn === 1)) {
+        var r = parseMove(payload.message.substring(6).trim());
+        if (r) {
+          nextTurn();
+        }
+      }
+      else {
+        console.log('WRONG TURN: ' + payload.speaker);
+      }
+    }
+  }
+  _onPluginMessage(payload);
+}
 
 function sendFEN(s) {
   x = 'http://www.gilith.com/chess/diagrams/?f=' + s.replace(/\//g, '%2F') + '&s=create';
@@ -66,6 +86,17 @@ function sendBoard() {
   sendFEN(fen.join('/'));
 }
 
+function parseMove(m) {
+  /* this is a basic variant, no checking yet */
+  a, b = m.split(' ');
+  return true;
+}
+
+function nextTurn() {
+  turn = 1 - turn;
+  sendBoard();
+}
+
 function play(player1, player2) {
   var t = Math.floor(Math.random() * 2);
   white = [player1, player2][t];
@@ -73,5 +104,9 @@ function play(player1, player2) {
   turn = 0;
   board = START_B;
   side = START_S;
+  playing = true;
 }
 
+function stop() {
+  playing = false;
+}
