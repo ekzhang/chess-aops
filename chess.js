@@ -30,13 +30,13 @@
   var _doInput = w.doInput;
   w.doInput = function doInput(s) {
     q.push(s);
-  }
+  };
   setInterval(function() {
     if (q.length > 0) _doInput(q.shift());
   }, 1100);
 
   var _onPluginMessage = Classroom.socket.onPluginMessage;
-  Classroom.socket.onPluginMessage = function(payload) {
+  Classroom.socket.onPluginMessage = function onPluginMessage(payload) {
     if (payload.message && payload.message.startsWith('@chess')) {
       var x = payload.message.split(' ');
       if (playing) {
@@ -62,7 +62,7 @@
       }
     }
     _onPluginMessage(payload);
-  }
+  };
 
   function sendFEN(s) {
     var x = 'http://www.gilith.com/chess/diagrams/?f=' + s.replace(/\//g, '%2F') + '&s=create';
@@ -105,7 +105,7 @@
     var a, b;
     [a, b] = m;
     try {
-      var x = function(s) { return s.charCodeAt(0) - 'a'.charCodeAt(0) }
+      var x = function(s) { return s.charCodeAt(0) - 'a'.charCodeAt(0) };
       var a1 = 8 - parseInt(a[1]);
       var a2 = x(a[0]);
       var b1 = 8 - parseInt(b[1]);
