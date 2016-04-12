@@ -43,7 +43,7 @@
       $(this).remove();
       w.doInput('[img]' + y + '[/img]');
     });
-  }
+  };
 
   var sendBoard = function() {
     var fen = [];
@@ -66,11 +66,11 @@
       fen.push(c.join(''));
     }
     sendFEN(fen.join('/'));
-  }
+  };
 
   var sendMod = function(s) {
     w.doInput('[b]{@chess} ' + s + '[/b]');
-  }
+  };
 
   var parseMove = function(m) {
     /* this is a basic variant, no checking yet */
@@ -92,12 +92,12 @@
       return false;
     }
     return true;
-  }
+  };
 
   var nextTurn = function() {
     turn = 1 - turn;
     sendBoard();
-  }
+  };
 
   var play = function(player1, player2) {
     var t = Math.floor(Math.random() * 2);
@@ -109,12 +109,12 @@
     playing = true;
     sendMod('The game has started. It is ' + white + '\'s turn.');
     sendBoard();
-  }
+  };
 
   var stop = function() {
     playing = false;
     sendMod('The game has ended.');
-  }
+  };
 
   var _onPluginMessage = Classroom.socket.onPluginMessage;
   Classroom.socket.onPluginMessage = function onPluginMessage(payload) {
