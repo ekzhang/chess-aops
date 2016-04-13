@@ -211,40 +211,46 @@
     /* this is a basic variant, no checking yet */
     var a, b;
     [a, b] = m;
-    try {
-      var x = function(s) { return s.charCodeAt(0) - 'a'.charCodeAt(0) };
-      var a1 = 8 - parseInt(a[1]);
-      var a2 = x(a[0]);
-      var b1 = 8 - parseInt(b[1]);
-      var b2 = x(b[0]);
 
-      if (turn != side[a1][a2]) {
-        sendMod('You cannot move your opponent\'s pieces. Please try again');
-        return false;
-      }
-
-      var good = threaten_list(a1, a2);
-      var inList = false;
-      for (var i = 0; i < good.length; i++) {
-        if (good[i][0] === b1 && good[i][1] === b2) {
-          inList = true;
-        }
-      }
-      if (inList) {
-        board[b1][b2] = board[a1][a2];
-        side[b1][b2] = side[a1][a2];
-        board[a1][a2] = '';
-        side[a1][a2] = -1;
-      }
-      else {
-        sendMod('That is an invalid move. Please try again.');
-        return false;
-      }
-    }
-    catch (err) {
-      console.error(err);
+    if (a.length != 2 || b.length != 2) {
+      sendMod('Your move is not on a legal square. Please try again.');
       return false;
     }
+    var x = function(s) { return s.charCodeAt(0) - 'a'.charCodeAt(0) };
+    var a1 = 8 - parseInt(a[1]);
+    var a2 = x(a[0]);
+    var b1 = 8 - parseInt(b[1]);
+    var b2 = x(b[0]);
+    
+    if (a1 < 0 || b1 < 0 || a1 >= 8 || b1 >= 8
+        || a2 < 0 || b2 < 0 || a2 >= 8 || b2 >= 8) {
+      sendMod('Your move is not on a legal square. Please try again.');
+      return false;
+    }
+
+    if (turn != side[a1][a2]) {
+      sendMod('You cannot move your opponent\'s pieces. Please try again.');
+      return false;
+    }
+
+    var good = threaten_list(a1, a2);
+    var inList = false;
+    for (var i = 0; i < good.length; i++) {
+      if (good[i][0] === b1 && good[i][1] === b2) {
+        inList = true;
+        break;
+      }
+    }
+    if (!inList) {
+      sendMod('That is an invalid move. Please try again.');
+      return false;
+    }
+
+    board[b1][b2] = board[a1][a2];
+    side[b1][b2] = side[a1][a2];
+    board[a1][a2] = '';
+    side[a1][a2] = -1;
+
     return true;
   };
 
