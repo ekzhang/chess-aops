@@ -128,7 +128,6 @@
     var c = start;
     var toReturn = [];
     while (c != end) {
-      // yield c; 
       toReturn.push(c);
       c++;
     }
@@ -146,7 +145,7 @@
             ret.push([a - 2, b]);
           }
         }
-        for (i = b - 1; i <= b + 1; i += 2) { // i hate for-in loops
+        for (i = b - 1; i <= b + 1; i += 2) {
           if (0 <= i && i < size && side[a - 1][i] === 1) {
             ret.push([a - 1, i]);
           }
@@ -158,7 +157,7 @@
             ret.push([a + 2, b]);
           }
         }
-        for (i = b - 1; i <= b + 1; i += 2) { // for-in
+        for (i = b - 1; i <= b + 1; i += 2) {
           if (0 <= i && i < size && side[a + 1][i] === 0) {
             ret.push([a + 1, i]);
           }
