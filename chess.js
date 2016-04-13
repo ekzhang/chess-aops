@@ -72,69 +72,7 @@
     w.doInput('[b]{@chess} ' + s + '[/b]');
   };
 
-  var parseMove = function(m) {
-    /* this is a basic variant, no checking yet */
-    var a, b;
-    [a, b] = m;
-    try {
-      var x = function(s) { return s.charCodeAt(0) - 'a'.charCodeAt(0) };
-      var a1 = 8 - parseInt(a[1]);
-      var a2 = x(a[0]);
-      var b1 = 8 - parseInt(b[1]);
-      var b2 = x(b[0]);
-      var good = threaten_list(board, a1, a2);
-      var inList = false;
-      for (var i = 0; i < good.length; i++) {
-        if (good[i][0] === b1 && good[i][1] === b2) {
-          inList = true;
-        }
-      }
-      if (inList) {
-        board[b1][b2] = board[a1][a2];
-        side[b1][b2] = side[a1][a2];
-        board[a1][a2] = '';
-        side[a1][a2] = -1;
-      } else { w.doInput("oops invalid move"); }
-    } catch (err) {
-      console.error(err);
-      return false;
-    }
-    return true;
-  };
-
-  var nextTurn = function() {
-    turn = 1 - turn;
-    sendBoard();
-  };
-
-  var play = function(player1, player2) {
-    var t = Math.floor(Math.random() * 2);
-    white = [player1, player2][t];
-    black = [player2, player1][t];
-    turn = 0;
-    board = $.extend(true, [], START_B);
-    side = $.extend(true, [], START_S);
-    playing = true;
-    sendMod('The game has started. It is ' + white + '\'s turn.');
-    sendBoard();
-  };
-
-  var stop = function() {
-    playing = false;
-    sendMod('The game has ended.');
-  };
-  
-  var counter = function(start = 1, end = 8) {
-    var c = start;
-    var toReturn = [];
-    while (c != end) {
-      toReturn.push(c);
-      c++;
-    }
-    return toReturn;
-  };
-
-  var threaten_list = function(board, a, b) {
+  var threaten_list = function(a, b) {
     var ret = [];
     var size = 8;
     if (board[a][b] === 'P') {
@@ -199,7 +137,7 @@
         if (side[a + i][b] === side[a][b]) {
           break;
         }
-        ret.push([a + i][b]);
+        ret.push([a + i, b]);
         if (board[a + i][b] !== ' ') {
           break;
         }
@@ -212,7 +150,7 @@
         if (side[a - i][b] === side[a][b]) {
           break;
         }
-        ret.push([a - i][b]);
+        ret.push([a - i, b]);
         if (board[a - i][b] !== ' ') {
           break;
         }
@@ -225,7 +163,7 @@
         if (side[a][b + i] === side[a][b]) {
           break;
         }
-        ret.push([a][b + i]);
+        ret.push([a, b + i]);
         if (board[a][b + i] !== ' ') {
           break;
         }
@@ -238,7 +176,7 @@
         if (side[a][b - i] === side[a][b]) {
           break;
         }
-        ret.push([a][b - i]);
+        ret.push([a, b - i]);
         if (board[a][b - i] !== ' ') {
           break;
         }
@@ -267,6 +205,79 @@
       }
     }
     return ret;
+  };
+
+  var parseMove = function(m) {
+    /* this is a basic variant, no checking yet */
+    var a, b;
+    [a, b] = m;
+    try {
+      var x = function(s) { return s.charCodeAt(0) - 'a'.charCodeAt(0) };
+      var a1 = 8 - parseInt(a[1]);
+      var a2 = x(a[0]);
+      var b1 = 8 - parseInt(b[1]);
+      var b2 = x(b[0]);
+
+      if (turn != side[a1][a2]) {
+        sendMod('You cannot move your opponent\'s pieces. Please try again');
+        return false;
+      }
+
+      var good = threaten_list(a1, a2);
+      var inList = false;
+      for (var i = 0; i < good.length; i++) {
+        if (good[i][0] === b1 && good[i][1] === b2) {
+          inList = true;
+        }
+      }
+      if (inList) {
+        board[b1][b2] = board[a1][a2];
+        side[b1][b2] = side[a1][a2];
+        board[a1][a2] = '';
+        side[a1][a2] = -1;
+      }
+      else {
+        sendMod('That is an invalid move. Please try again.');
+        return false;
+      }
+    }
+    catch (err) {
+      console.error(err);
+      return false;
+    }
+    return true;
+  };
+
+  var nextTurn = function() {
+    turn = 1 - turn;
+    sendBoard();
+  };
+
+  var play = function(player1, player2) {
+    var t = Math.floor(Math.random() * 2);
+    white = [player1, player2][t];
+    black = [player2, player1][t];
+    turn = 0;
+    board = $.extend(true, [], START_B);
+    side = $.extend(true, [], START_S);
+    playing = true;
+    sendMod('The game has started. It is ' + white + '\'s turn.');
+    sendBoard();
+  };
+
+  var stop = function() {
+    playing = false;
+    sendMod('The game has ended.');
+  };
+  
+  var counter = function(start = 1, end = 8) {
+    var c = start;
+    var toReturn = [];
+    while (c != end) {
+      toReturn.push(c);
+      c++;
+    }
+    return toReturn;
   };
 
   var _onPluginMessage = Classroom.socket.onPluginMessage;
