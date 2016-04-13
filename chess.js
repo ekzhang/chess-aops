@@ -221,7 +221,7 @@
     var a2 = x(a[0]);
     var b1 = 8 - parseInt(b[1]);
     var b2 = x(b[0]);
-    
+
     if (a1 < 0 || b1 < 0 || a1 >= 8 || b1 >= 8
         || a2 < 0 || b2 < 0 || a2 >= 8 || b2 >= 8) {
       sendMod('Your move is not on a legal square. Please try again.');
@@ -233,6 +233,7 @@
       return false;
     }
 
+    /* basic check that you can move the piece there by chess rules */
     var good = threaten_list(a1, a2);
     var inList = false;
     for (var i = 0; i < good.length; i++) {
@@ -250,6 +251,10 @@
     side[b1][b2] = side[a1][a2];
     board[a1][a2] = '';
     side[a1][a2] = -1;
+
+    if (board[b1][b2] == 'P' && (b1 == 0 || b1 == 7)) {
+      board[b1][b2] = 'Q';
+    }
 
     return true;
   };
