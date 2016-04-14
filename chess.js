@@ -74,17 +74,16 @@
 
   var threaten_list = function(a, b) {
     var ret = [];
-    var size = 8;
     if (board[a][b] === 'P') {
       if (side[a][b] === 0) {
         if (board[a - 1][b] === '') {
           ret.push([a - 1, b]);
-          if (a === size - 2 && board[a - 2][b] === '') {
+          if (a === 8 - 2 && board[a - 2][b] === '') {
             ret.push([a - 2, b]);
           }
         }
         for (i = b - 1; i <= b + 1; i += 2) {
-          if (0 <= i && i < size && side[a - 1][i] === 1) {
+          if (0 <= i && i < 8 && side[a - 1][i] === 1) {
             ret.push([a - 1, i]);
           }
         }
@@ -96,7 +95,7 @@
           }
         }
         for (i = b - 1; i <= b + 1; i += 2) {
-          if (0 <= i && i < size && side[a + 1][i] === 0) {
+          if (0 <= i && i < 8 && side[a + 1][i] === 0) {
             ret.push([a + 1, i]);
           }
         }
@@ -108,7 +107,7 @@
           if (i === a && j === b) {
             continue;
           }
-          if (0 <= i && i < size && 0 <= j && j < size
+          if (0 <= i && i < 8 && 0 <= j && j < 8
                   && side[i][j] !== side[a][b]) {
             ret.push([i, j]);
           }
@@ -120,7 +119,7 @@
             [1, -2], [2, -1], [-1, -2], [-2, -1]];
       for (var i = 0; i < KNIGHT_MOVES.length; i++) {
         var m = KNIGHT_MOVES[i];
-        if (0 <= a + m[0] && a + m[0] < size && 0 <= b + m[1] && b + m[1] < size) {
+        if (0 <= a + m[0] && a + m[0] < 8 && 0 <= b + m[1] && b + m[1] < 8) {
           if (side[a][b] != side[a + m[0]][b + m[1]]) {
             ret.push([a + m[0], b + m[1]]);
           }
@@ -128,22 +127,19 @@
       }
     }
     if (board[a][b] === 'R' || board[a][b] === 'Q') {
-      var c = counter();
-      for (var j = 0; j < c.length; j++) {
-        var i = c[j];
-        if (a + i >= size) {
+      for (var i = 1; i <= 8; i++) {
+        if (a + i >= 8) {
           break;
         }
         if (side[a + i][b] === side[a][b]) {
           break;
         }
         ret.push([a + i, b]);
-        if (board[a + i][b] !== ' ') {
+        if (board[a + i][b]) {
           break;
         }
       }
-      for (var j = 0; j < c.length; j++) {
-        var i = c[j];
+      for (var i = 1; i <= 8; i++) {
         if (a - i < 0) {
           break;
         }
@@ -151,33 +147,31 @@
           break;
         }
         ret.push([a - i, b]);
-        if (board[a - i][b] !== ' ') {
+        if (board[a - i][b]) {
           break;
         }
       }
-      for (var j = 0; j < c.length; j++) {
-        var i = c[j];
-        if (b + i > size) {
+      for (var i = 1; i <= 8; i++) {
+        if (b + i >= 8) {
           break;
         }
         if (side[a][b + i] === side[a][b]) {
           break;
         }
         ret.push([a, b + i]);
-        if (board[a][b + i] !== ' ') {
+        if (board[a][b + i]) {
           break;
         }
       }
-      for (var j = 0; j < c.length; j++) {
-        var i = c[j];
-        if (b - i > size) {
+      for (var i = 1; i <= 8; i++) {
+        if (b - i < 0) {
           break;
         }
         if (side[a][b - i] === side[a][b]) {
           break;
         }
         ret.push([a, b - i]);
-        if (board[a][b - i] !== ' ') {
+        if (board[a][b - i]) {
           break;
         }
       }
@@ -186,12 +180,10 @@
       var BISHOP_MOVES = [[1, 1], [1, -1], [-1, 1], [-1, -1]];
       for (var j = 0; j < BISHOP_MOVES.length; j++) {
         var m = BISHOP_MOVES[j];
-        var c = counter();
-        for (var k = 0; k < c.length; k++) {
-          var i = c[k];
+        for (var i = 1; i <= 8; i++) {
           var na = a + m[0] * i;
           var nb = b + m[1] * i;
-          if (!(0 <= na && na < size && 0 <= nb && nb < size)) {
+          if (!(0 <= na && na < 8 && 0 <= nb && nb < 8)) {
             break;
           }
           if (side[na][nb] === side[a][b]) {
@@ -279,16 +271,6 @@
   var stop = function() {
     playing = false;
     sendMod('The game has ended.');
-  };
-  
-  var counter = function(start = 1, end = 8) {
-    var c = start;
-    var toReturn = [];
-    while (c != end) {
-      toReturn.push(c);
-      c++;
-    }
-    return toReturn;
   };
 
   var _onPluginMessage = Classroom.socket.onPluginMessage;
