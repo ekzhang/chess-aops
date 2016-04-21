@@ -235,7 +235,7 @@
             board[7][6] = 'K'; side[7][6] = 0;
             board[7][5] = 'R'; side[7][5] = 0;
             board[7][4] = ''; side[7][4] = -1;
-            board[7][8] = ''; side[7][8] = -1;
+            board[7][7] = ''; side[7][7] = -1;
             white_can_castle = false;
             return true;
         }
@@ -259,7 +259,7 @@
             board[0][6] = 'K'; side[0][6] = 1;
             board[0][5] = 'R'; side[0][5] = 1;
             board[0][4] = ''; side[0][4] = -1;
-            board[0][8] = ''; side[0][8] = -1;
+            board[0][7] = ''; side[0][7] = -1;
             black_can_castle = false;
             return true;
         }
