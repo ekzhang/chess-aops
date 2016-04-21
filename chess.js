@@ -229,8 +229,8 @@
     }
 
     if (turn == 0 && white_can_castle){ // white castle
-      if(a1 == 7 && a2 == 4 && board[7][4] == 'K' && side[7][4] = 0){
-        if(b1 == 7 && b2 == 6 && // white kingside castle
+      if (a1 == 7 && a2 == 4 && board[7][4] == 'K' && side[7][4] = 0){
+        if (b1 == 7 && b2 == 6 && // white kingside castle
           board[7][7] == 'R' && board[7][6] == '' && board[7][5] == ''){
             board[7][6] = 'K'; side[7][6] = 0;
             board[7][5] = 'R'; side[7][5] = 0;
@@ -239,7 +239,7 @@
             white_can_castle = false;
             return true;
         }
-        if(b1 == 7 && b2 == 2 && // white queenside castle
+        if (b1 == 7 && b2 == 2 && // white queenside castle
           board[7][0] == 'R' && board[7][1] == '' &&
           board[7][2] == '' && board[7][3] == ''){
             board[7][2] = 'K'; side[7][2] = 0;
@@ -253,8 +253,8 @@
     }
 
     if (turn == 0 && black_can_castle){ // black castle
-      if(a1 == 0 && a2 == 4 && board[0][4] == 'K' && side[0][4] = 1){
-        if(b1 == 0 && b2 == 6 && // black kingside castle
+      if (a1 == 0 && a2 == 4 && board[0][4] == 'K' && side[0][4] = 1){
+        if (b1 == 0 && b2 == 6 && // black kingside castle
           board[0][7] == 'R' && board[0][6] == '' && board[0][5] == ''){
             board[0][6] = 'K'; side[0][6] = 1;
             board[0][5] = 'R'; side[0][5] = 1;
@@ -263,7 +263,7 @@
             black_can_castle = false;
             return true;
         }
-        if(b1 == 0 && b2 == 2 && // black queenside castle
+        if (b1 == 0 && b2 == 2 && // black queenside castle
           board[0][0] == 'R' && board[0][1] == '' &&
           board[0][2] == '' && board[0][3] == ''){
             board[0][2] = 'K'; side[0][2] = 1;
@@ -291,11 +291,11 @@
       return false;
     }
 
-    if(board[a1][b1] == 'K'){
-      if(turn == 0){
+    if (board[a1][b1] == 'K'){
+      if (turn == 0){
         white_can_castle = false;
       }
-      if(turn == 1){
+      if (turn == 1){
         black_can_castle = false;
       }
     }
