@@ -1,13 +1,14 @@
 !function(ROOM_ID) {
   'use strict';
-  var START_B = [['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'],
-                 ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],
-                 ['' , '' , '' , '' , '' , '' , '' , '' ],
-                 ['' , '' , '' , '' , '' , '' , '' , '' ],
-                 ['' , '' , '' , '' , '' , '' , '' , '' ],
-                 ['' , '' , '' , '' , '' , '' , '' , '' ],
-                 ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],
-                 ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']];
+  //               0    1    2    3    4    5    6    7
+  var START_B = [['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'], // 0
+                 ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'], // 1
+                 ['' , '' , '' , '' , '' , '' , '' , '' ], // 2
+                 ['' , '' , '' , '' , '' , '' , '' , '' ], // 3
+                 ['' , '' , '' , '' , '' , '' , '' , '' ], // 4
+                 ['' , '' , '' , '' , '' , '' , '' , '' ], // 5
+                 ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'], // 6
+                 ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']]; // 7
   var START_S = [[1, 1, 1, 1, 1, 1, 1, 1],
                  [1, 1, 1, 1, 1, 1, 1, 1],
                  [-1, -1, -1, -1, -1, -1, -1, -1],
@@ -23,6 +24,8 @@
   var board;
   var side;
   var playing;
+  var black_can_castle;
+  var white_can_castle;
 
   var q = [];
   var w = App.getWindow(ROOM_ID);
@@ -53,7 +56,7 @@
       for (var j = 0; j < 8; ++j) {
         if (board[i][j]) {
           if (t) {
-            c.push(t); 
+            c.push(t);
             t = 0;
           }
           c.push(side[i][j] ? board[i][j].toLowerCase() : board[i][j]);
@@ -225,6 +228,55 @@
       return false;
     }
 
+    if (turn == 0 && white_can_castle){ // white castle
+      if(a1 == 7 && a2 == 4){
+        if(b1 == 7 && b2 == 6 && // white kingside castle
+          board[7][7] == 'R' && board[7][6] == '' && board[7][5] == ''){
+            board[7][6] = 'K'; side[7][6] = 0;
+            board[7][5] = 'R'; side[7][5] = 0;
+            board[7][4] = ''; side[7][4] = -1;
+            board[7][8] = ''; side[7][8] = -1;
+            white_can_castle = false;
+            return true;
+        }
+        if(b1 == 7 && b2 == 2 && // white queenside castle
+          board[7][0] == 'R' && board[7][1] == '' &&
+          board[7][2] == '' && board[7][3] == ''){
+            board[7][2] = 'K'; side[7][2] = 0;
+            board[7][3] = 'R'; side[7][3] = 0;
+            board[7][0] = ''; side[7][0] = -1;
+            board[7][4] = ''; side[7][4] = -1;
+            white_can_castle = false;
+            return true;
+        }
+      }
+    }
+
+    if (turn == 0 && black_can_castle){ // black castle
+      if(a1 == 0 && a2 == 4){
+        if(b1 == 0 && b2 == 6 && // black kingside castle
+          board[0][7] == 'R' && board[0][6] == '' && board[0][5] == ''){
+            board[0][6] = 'K'; side[0][6] = 1;
+            board[0][5] = 'R'; side[0][5] = 1;
+            board[0][4] = ''; side[0][4] = -1;
+            board[0][8] = ''; side[0][8] = -1;
+            black_can_castle = false;
+            return true;
+        }
+        if(b1 == 0 && b2 == 2 && // black queenside castle
+          board[0][0] == 'R' && board[0][1] == '' &&
+          board[0][2] == '' && board[0][3] == ''){
+            board[0][2] = 'K'; side[0][2] = 1;
+            board[0][3] = 'R'; side[0][3] = 1;
+            board[0][0] = ''; side[0][0] = -1;
+            board[0][1] = ''; side[0][1] = -1;
+            board[0][4] = ''; side[0][4] = -1;
+            black_can_castle = false;
+            return true;
+        }
+      }
+    }
+
     /* basic check that you can move the piece there by chess rules */
     var good = threaten_list(a1, a2);
     var inList = false;
@@ -261,6 +313,8 @@
     white = [player1, player2][t];
     black = [player2, player1][t];
     turn = 0;
+    black_can_castle = true;
+    white_can_castle = true;
     board = $.extend(true, [], START_B);
     side = $.extend(true, [], START_S);
     playing = true;
