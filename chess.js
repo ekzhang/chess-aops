@@ -300,10 +300,36 @@
       }
     }
 
+    var prev = board[b1][b2];
+    var prev_side = side[b1][b2];
+
     board[b1][b2] = board[a1][a2];
     side[b1][b2] = side[a1][a2];
     board[a1][a2] = '';
     side[a1][a2] = -1;
+
+    /* make sure we don't put/leave ourself in check illegally */
+    for (var i = 0; i < 8; i++) {
+      for (var j = 0; j < 8; j++) {
+        if (side[i][j] != turn) {
+          var fail = false;
+          threaten_list(i, j).forEach(function(x) {
+            if (board[x[0]][x[1]] === 'K') {
+              /* oops we put ourself in illegal check */
+              fail = true;
+            }
+          });
+          if (fail) {
+            board[a1][a2] = board[b1][b2];
+            side[a1][a2] = side[b1][b2];
+            board[b1][b2] = prev;
+            side[b1][b2] = prev_side;
+            sendMod('You cannot move yourself into check. Please try again.');
+            return false;
+          }
+        }
+      }
+    }
 
     if (board[b1][b2] == 'P' && (b1 == 0 || b1 == 7)) {
       board[b1][b2] = 'Q';
