@@ -72,7 +72,7 @@
   };
 
   var sendMod = function(s) {
-    w.doInput('[b]{@chess} ' + s + '[/b]');
+    w.doInput('[color=black][b]{@chess}[/b] ' + s + '[/color]');
   };
 
   var threaten_list = function(a, b) {
@@ -331,9 +331,12 @@
     sendBoard();
   };
 
-  var stop = function() {
+  var stop = function(winner) {
     playing = false;
     sendMod('The game has ended.');
+    if (winner) {
+      sendMod('Congrats to the winner, [u]' + winner + '[/u].');
+    }
   };
 
   var _onPluginMessage = Classroom.socket.onPluginMessage;
