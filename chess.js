@@ -395,4 +395,4 @@
     _onPluginMessage(payload);
   };
 
-}(971);
+}(prompt('What room ID to use?').toLowerCase());
