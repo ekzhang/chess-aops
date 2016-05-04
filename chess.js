@@ -120,8 +120,8 @@
     if (board[a][b] === 'N') {
       var KNIGHT_MOVES = [[1, 2], [2, 1], [-1, 2], [-2, 1],
             [1, -2], [2, -1], [-1, -2], [-2, -1]];
-      for (var i = 0; i < KNIGHT_MOVES.length; i++) {
-        var m = KNIGHT_MOVES[i];
+      for (let i = 0; i < KNIGHT_MOVES.length; i++) {
+        let m = KNIGHT_MOVES[i];
         if (0 <= a + m[0] && a + m[0] < 8 && 0 <= b + m[1] && b + m[1] < 8) {
           if (side[a][b] != side[a + m[0]][b + m[1]]) {
             ret.push([a + m[0], b + m[1]]);
@@ -130,7 +130,7 @@
       }
     }
     if (board[a][b] === 'R' || board[a][b] === 'Q') {
-      for (var i = 1; i <= 8; i++) {
+      for (let i = 1; i <= 8; i++) {
         if (a + i >= 8) {
           break;
         }
@@ -142,7 +142,7 @@
           break;
         }
       }
-      for (var i = 1; i <= 8; i++) {
+      for (let i = 1; i <= 8; i++) {
         if (a - i < 0) {
           break;
         }
@@ -154,7 +154,7 @@
           break;
         }
       }
-      for (var i = 1; i <= 8; i++) {
+      for (let i = 1; i <= 8; i++) {
         if (b + i >= 8) {
           break;
         }
@@ -166,7 +166,7 @@
           break;
         }
       }
-      for (var i = 1; i <= 8; i++) {
+      for (let i = 1; i <= 8; i++) {
         if (b - i < 0) {
           break;
         }
@@ -181,11 +181,11 @@
     }
     if (board[a][b] === 'B' || board[a][b] === 'Q') {
       var BISHOP_MOVES = [[1, 1], [1, -1], [-1, 1], [-1, -1]];
-      for (var j = 0; j < BISHOP_MOVES.length; j++) {
-        var m = BISHOP_MOVES[j];
-        for (var i = 1; i <= 8; i++) {
-          var na = a + m[0] * i;
-          var nb = b + m[1] * i;
+      for (let j = 0; j < BISHOP_MOVES.length; j++) {
+        let m = BISHOP_MOVES[j];
+        for (let i = 1; i <= 8; i++) {
+          let na = a + m[0] * i;
+          let nb = b + m[1] * i;
           if (!(0 <= na && na < 8 && 0 <= nb && nb < 8)) {
             break;
           }
@@ -211,7 +211,7 @@
       sendMod('Your move is not on a legal square. Please try again.');
       return false;
     }
-    var x = function(s) { return s.charCodeAt(0) - 'a'.charCodeAt(0) };
+    var x = function(s) { return s.charCodeAt(0) - 'a'.charCodeAt(0); };
     var a1 = 8 - parseInt(a[1]);
     var a2 = x(a[0]);
     var b1 = 8 - parseInt(b[1]);
@@ -280,7 +280,7 @@
     /* basic check that you can move the piece there by chess rules */
     var good = threaten_list(a1, a2);
     var inList = false;
-    for (var i = 0; i < good.length; i++) {
+    for (let i = 0; i < good.length; i++) {
       if (good[i][0] === b1 && good[i][1] === b2) {
         inList = true;
         break;
@@ -309,8 +309,8 @@
     side[a1][a2] = -1;
 
     /* make sure we don't put/leave ourself in check illegally */
-    for (var i = 0; i < 8; i++) {
-      for (var j = 0; j < 8; j++) {
+    for (let i = 0; i < 8; i++) {
+      for (let j = 0; j < 8; j++) {
         if (side[i][j] != turn) {
           var fail = false;
           threaten_list(i, j).forEach(function(x) {
