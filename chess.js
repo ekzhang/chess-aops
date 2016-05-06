@@ -204,6 +204,26 @@
     return ret;
   };
 
+  var isThreatened = function(a, b) {
+    for (let i = 0; i < 8; i++) {
+      for (let j = 0; j < 8; j++) {
+        if (side[i][j] != side[a][b]) {
+          var fail = false;
+          threaten_list(i, j).forEach(function(x) {
+            if (x[0] === a && x[1] === b) {
+              /* oops someone's threatening the (a, b) square */
+              fail = true;
+            }
+          });
+          if (fail) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  };
+
   var parseMove = function(m) {
     /* this is a basic variant, no checking yet */
     var a, b;
@@ -235,22 +255,26 @@
       if (a1 === 7 && a2 === 4 && board[7][4] === 'K' && side[7][4] === 0) {
         if (!moved_white_rook[0] && b1 === 7 && b2 === 6 && // white kingside castle
             board[7][7] === 'R' && board[7][6] === '' && board[7][5] === '') {
-          board[7][6] = 'K'; side[7][6] = 0;
-          board[7][5] = 'R'; side[7][5] = 0;
-          board[7][4] = ''; side[7][4] = -1;
-          board[7][7] = ''; side[7][7] = -1;
-          white_can_castle = false;
-          return true;
+          if (!isThreatened(7, 4) && !isThreatened(7, 5) && !isThreatened(7, 6)) {
+            board[7][6] = 'K'; side[7][6] = 0;
+            board[7][5] = 'R'; side[7][5] = 0;
+            board[7][4] = ''; side[7][4] = -1;
+            board[7][7] = ''; side[7][7] = -1;
+            white_can_castle = false;
+            return true;
+          }
         }
         if (!moved_white_rook[1] && b1 === 7 && b2 === 2 && // white queenside castle
             board[7][0] === 'R' && board[7][1] === '' &&
             board[7][2] === '' && board[7][3] === '') {
-          board[7][2] = 'K'; side[7][2] = 0;
-          board[7][3] = 'R'; side[7][3] = 0;
-          board[7][0] = ''; side[7][0] = -1;
-          board[7][4] = ''; side[7][4] = -1;
-          white_can_castle = false;
-          return true;
+          if (!isThreatened(7, 4) && !isThreatened(7, 3) && !isThreatened(7, 2)) {
+            board[7][2] = 'K'; side[7][2] = 0;
+            board[7][3] = 'R'; side[7][3] = 0;
+            board[7][0] = ''; side[7][0] = -1;
+            board[7][4] = ''; side[7][4] = -1;
+            white_can_castle = false;
+            return true;
+          }
         }
       }
     }
@@ -259,22 +283,26 @@
       if (a1 === 0 && a2 === 4 && board[0][4] === 'K' && side[0][4] === 1) {
         if (!moved_black_rook[0] && b1 === 0 && b2 === 6 && // black kingside castle
             board[0][7] === 'R' && board[0][6] === '' && board[0][5] === '') {
-          board[0][6] = 'K'; side[0][6] = 1;
-          board[0][5] = 'R'; side[0][5] = 1;
-          board[0][4] = ''; side[0][4] = -1;
-          board[0][7] = ''; side[0][7] = -1;
-          black_can_castle = false;
-          return true;
+          if (!isThreatened(0, 4) && !isThreatened(0, 5) && !isThreatened(0, 6)) {
+            board[0][6] = 'K'; side[0][6] = 1;
+            board[0][5] = 'R'; side[0][5] = 1;
+            board[0][4] = ''; side[0][4] = -1;
+            board[0][7] = ''; side[0][7] = -1;
+            black_can_castle = false;
+            return true;
+          }
         }
         if (!moved_black_rook[1] && b1 === 0 && b2 === 2 && // black queenside castle
             board[0][0] === 'R' && board[0][1] === '' &&
             board[0][2] === '' && board[0][3] === '') {
-          board[0][2] = 'K'; side[0][2] = 1;
-          board[0][3] = 'R'; side[0][3] = 1;
-          board[0][0] = ''; side[0][0] = -1;
-          board[0][4] = ''; side[0][4] = -1;
-          black_can_castle = false;
-          return true;
+          if (!isThreatened(0, 4) && !isThreatened(0, 3) && !isThreatened(0, 2)) {
+            board[0][2] = 'K'; side[0][2] = 1;
+            board[0][3] = 'R'; side[0][3] = 1;
+            board[0][0] = ''; side[0][0] = -1;
+            board[0][4] = ''; side[0][4] = -1;
+            black_can_castle = false;
+            return true;
+          }
         }
       }
     }
@@ -304,22 +332,18 @@
     /* make sure we don't put/leave ourself in check illegally */
     for (let i = 0; i < 8; i++) {
       for (let j = 0; j < 8; j++) {
-        if (side[i][j] != turn) {
-          var fail = false;
-          threaten_list(i, j).forEach(function(x) {
-            if (board[x[0]][x[1]] === 'K') {
-              /* oops we put ourself in illegal check */
-              fail = true;
-            }
-          });
-          if (fail) {
-            board[a1][a2] = board[b1][b2];
-            side[a1][a2] = side[b1][b2];
-            board[b1][b2] = prev;
-            side[b1][b2] = prev_side;
-            sendMod('You cannot move yourself into check. Please try again.');
-            return false;
-          }
+        /* find the actual king */
+        if (board[i][j] != 'K' || side[i][j] != turn)
+          continue;
+
+        if (isThreatened(i, j)) {
+          /* crap our king is threatened */
+          board[a1][a2] = board[b1][b2];
+          side[a1][a2] = side[b1][b2];
+          board[b1][b2] = prev;
+          side[b1][b2] = prev_side;
+          sendMod('You cannot move yourself into check. Please try again.');
+          return false;
         }
       }
     }
