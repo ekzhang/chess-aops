@@ -26,6 +26,8 @@
   var playing;
   var black_can_castle;
   var white_can_castle;
+  var moved_white_rook;
+  var moved_black_rook;
 
   var q = [];
   var w = App.getWindow(ROOM_ID);
@@ -231,7 +233,7 @@
     // TODO: check for threatened squares in middle of castle
     if (turn === 0 && white_can_castle) { // white castle
       if (a1 === 7 && a2 === 4 && board[7][4] === 'K' && side[7][4] === 0) {
-        if (b1 === 7 && b2 === 6 && // white kingside castle
+        if (!moved_white_rook[0] && b1 === 7 && b2 === 6 && // white kingside castle
             board[7][7] === 'R' && board[7][6] === '' && board[7][5] === '') {
           board[7][6] = 'K'; side[7][6] = 0;
           board[7][5] = 'R'; side[7][5] = 0;
@@ -240,7 +242,7 @@
           white_can_castle = false;
           return true;
         }
-        if (b1 === 7 && b2 === 2 && // white queenside castle
+        if (!moved_white_rook[1] && b1 === 7 && b2 === 2 && // white queenside castle
             board[7][0] === 'R' && board[7][1] === '' &&
             board[7][2] === '' && board[7][3] === '') {
           board[7][2] = 'K'; side[7][2] = 0;
@@ -255,7 +257,7 @@
 
     if (turn === 1 && black_can_castle) { // black castle
       if (a1 === 0 && a2 === 4 && board[0][4] === 'K' && side[0][4] === 1) {
-        if (b1 === 0 && b2 === 6 && // black kingside castle
+        if (!moved_black_rook[0] && b1 === 0 && b2 === 6 && // black kingside castle
             board[0][7] === 'R' && board[0][6] === '' && board[0][5] === '') {
           board[0][6] = 'K'; side[0][6] = 1;
           board[0][5] = 'R'; side[0][5] = 1;
@@ -264,7 +266,7 @@
           black_can_castle = false;
           return true;
         }
-        if (b1 === 0 && b2 === 2 && // black queenside castle
+        if (!moved_black_rook[1] && b1 === 0 && b2 === 2 && // black queenside castle
             board[0][0] === 'R' && board[0][1] === '' &&
             board[0][2] === '' && board[0][3] === '') {
           board[0][2] = 'K'; side[0][2] = 1;
@@ -289,15 +291,6 @@
     if (!inList) {
       sendMod('That is an invalid move. Please try again.');
       return false;
-    }
-
-    if (board[a1][a2] === 'K') {
-      if (turn == 0) {
-        white_can_castle = false;
-      }
-      if (turn == 1) {
-        black_can_castle = false;
-      }
     }
 
     var prev = board[b1][b2];
@@ -331,7 +324,37 @@
       }
     }
 
-    if (board[b1][b2] == 'P' && (b1 == 0 || b1 == 7)) {
+    if (board[b1][b2] === 'K') {
+      if (turn == 0) {
+        white_can_castle = false;
+      }
+      if (turn == 1) {
+        black_can_castle = false;
+      }
+    }
+
+    if (board[b1][b2] === 'R') {
+      if (turn === 0) {
+        // white
+        if (a1 === 7 && a2 === 7) {
+          moved_white_rook[0] = true;
+        }
+        if (a1 === 7 && a2 === 0) {
+          moved_white_rook[1] = true;
+        }
+      }
+      else {
+        // black
+        if (a1 === 0 && a2 === 7) {
+          moved_black_rook[0] = true;
+        }
+        if (a1 === 0 && a2 === 0) {
+          moved_black_rook[1] = true;
+        }
+      }
+    }
+
+    if (board[b1][b2] === 'P' && (b1 == 0 || b1 == 7)) {
       board[b1][b2] = 'Q';
     }
 
@@ -350,6 +373,8 @@
     turn = 0;
     black_can_castle = true;
     white_can_castle = true;
+    moved_white_rook = [false, false];
+    moved_black_rook = [false, false];
     board = $.extend(true, [], START_B);
     side = $.extend(true, [], START_S);
     playing = true;
