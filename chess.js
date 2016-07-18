@@ -250,7 +250,7 @@
       return false;
     }
 
-    // TODO: check for threatened squares in middle of castle
+    // TODO: fix castling bug?!
     if (turn === 0 && white_can_castle) { // white castle
       if (a1 === 7 && a2 === 4 && board[7][4] === 'K' && side[7][4] === 0) {
         if (!moved_white_rook[0] && b1 === 7 && b2 === 6 && // white kingside castle
