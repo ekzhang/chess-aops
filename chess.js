@@ -9,25 +9,22 @@
                  ['' , '' , '' , '' , '' , '' , '' , '' ], // 5
                  ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'], // 6
                  ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']]; // 7
-  var START_S = [[1, 1, 1, 1, 1, 1, 1, 1],
-                 [1, 1, 1, 1, 1, 1, 1, 1],
+  var START_S = [[ 1,  1,  1,  1,  1,  1,  1,  1],
+                 [ 1,  1,  1,  1,  1,  1,  1,  1],
                  [-1, -1, -1, -1, -1, -1, -1, -1],
                  [-1, -1, -1, -1, -1, -1, -1, -1],
                  [-1, -1, -1, -1, -1, -1, -1, -1],
                  [-1, -1, -1, -1, -1, -1, -1, -1],
-                 [0, 0, 0, 0, 0, 0, 0, 0],
-                 [0, 0, 0, 0, 0, 0, 0, 0]];
+                 [ 0,  0,  0,  0,  0,  0,  0,  0],
+                 [ 0,  0,  0,  0,  0,  0,  0,  0]];
 
-  var white;
-  var black;
+  var white, black;
   var turn;
   var board;
   var side;
   var playing;
-  var black_can_castle;
-  var white_can_castle;
-  var moved_white_rook;
-  var moved_black_rook;
+  var black_can_castle, white_can_castle;
+  var moved_white_rook, moved_black_rook;
 
   var q = [];
   var w = App.getWindow(ROOM_ID);
@@ -42,20 +39,20 @@
 
   var sendFEN = function(s) {
     /* this is the hacky API call */
-    var x = 'http://www.gilith.com/chess/diagrams/?f=' + s.replace(/\//g, '%2F') + '&s=create';
-    var y = 'http://www.gilith.com/chess/diagrams/images/' + s.replace(/\//g, '_') + '.png';
-    $('<iframe src="' + x + '">').appendTo('body').load(function() {
+    var poslink = 'http://www.gilith.com/chess/diagrams/?f=' + s.replace(/\//g, '%2F') + '&s=create';
+    var imglink = 'http://www.gilith.com/chess/diagrams/images/' + s.replace(/\//g, '_') + '.png';
+    $('<iframe src="' + poslink + '">').appendTo('body').load(function() {
       $(this).remove();
-      w.doInput('[img]' + y + '[/img]');
+      w.doInput('[img]' + imglink + '[/img]');
     });
   };
 
   var sendBoard = function() {
     var fen = [];
-    for (var i = 0; i < 8; ++i) {
+    for (let i = 0; i < 8; ++i) {
       var c = [];
       var t = 0;
-      for (var j = 0; j < 8; ++j) {
+      for (let j = 0; j < 8; ++j) {
         if (board[i][j]) {
           if (t) {
             c.push(t);
@@ -77,9 +74,15 @@
     w.doInput('[color=black][b]{@chess}[/b] ' + s + '[/color]');
   };
 
+  var isInBoard = function(a, b){
+    return 0 <= a && a < 8 && 0 <= b && b < 8;
+  }
+
   var threaten_list = function(a, b) {
     var ret = [];
-    if (board[a][b] === 'P') {
+
+    switch(board[a][b]){
+    case 'P':
       if (side[a][b] === 0) {
         if (board[a - 1][b] === '') {
           ret.push([a - 1, b]);
@@ -87,7 +90,7 @@
             ret.push([a - 2, b]);
           }
         }
-        for (i = b - 1; i <= b + 1; i += 2) {
+        for (let i = b - 1; i <= b + 1; i += 2) {
           if (0 <= i && i < 8 && side[a - 1][i] === 1) {
             ret.push([a - 1, i]);
           }
@@ -105,99 +108,55 @@
           }
         }
       }
-    }
-    if (board[a][b] === 'K') {
-      for (var i = a - 1; i <= a + 1; i++) {
-        for (var j = b - 1; j <= b + 1; j++) {
-          if (i === a && j === b) {
-            continue;
-          }
-          if (0 <= i && i < 8 && 0 <= j && j < 8
-                  && side[i][j] !== side[a][b]) {
+      break;
+    case 'K':
+      for (let i = a - 1; i <= a + 1; i++) {
+        for (let j = b - 1; j <= b + 1; j++) {
+          if (i === a && j === b) continue;
+          if (isInBoard(i, j) && side[i][j] !== side[a][b]) {
             ret.push([i, j]);
           }
         }
       }
-    }
-    if (board[a][b] === 'N') {
+      break;
+    case 'N':
       var KNIGHT_MOVES = [[1, 2], [2, 1], [-1, 2], [-2, 1],
             [1, -2], [2, -1], [-1, -2], [-2, -1]];
       for (let i = 0; i < KNIGHT_MOVES.length; i++) {
         let m = KNIGHT_MOVES[i];
-        if (0 <= a + m[0] && a + m[0] < 8 && 0 <= b + m[1] && b + m[1] < 8) {
+        if (isInBoard(a + m[0], b + m[1])) {
           if (side[a][b] != side[a + m[0]][b + m[1]]) {
             ret.push([a + m[0], b + m[1]]);
           }
         }
       }
-    }
-    if (board[a][b] === 'R' || board[a][b] === 'Q') {
-      for (let i = 1; i <= 8; i++) {
-        if (a + i >= 8) {
-          break;
-        }
-        if (side[a + i][b] === side[a][b]) {
-          break;
-        }
-        ret.push([a + i, b]);
-        if (board[a + i][b]) {
-          break;
-        }
-      }
-      for (let i = 1; i <= 8; i++) {
-        if (a - i < 0) {
-          break;
-        }
-        if (side[a - i][b] === side[a][b]) {
-          break;
-        }
-        ret.push([a - i, b]);
-        if (board[a - i][b]) {
-          break;
+    break;
+    case 'Q':
+    case 'R':
+      var ROOK_MOVES = [[0, 1], [0, -1], [1, 0]], [-1, 0]];
+      for (let j = 0; j < ROOK_MOVES.length; j++) {
+        let m = ROOK_MOVES[j];
+        for (let i = 1; i <= 8; i++) {
+          let na = a + m[0] * i;
+          let nb = b + m[1] * i;
+          if (!isInBoard(na, nb)) break;
+          if (side[na][nb] === side[a][b]) break;
+          ret.push([na, nb]);
+          if (board[na][nb] !== '') break;
         }
       }
-      for (let i = 1; i <= 8; i++) {
-        if (b + i >= 8) {
-          break;
-        }
-        if (side[a][b + i] === side[a][b]) {
-          break;
-        }
-        ret.push([a, b + i]);
-        if (board[a][b + i]) {
-          break;
-        }
-      }
-      for (let i = 1; i <= 8; i++) {
-        if (b - i < 0) {
-          break;
-        }
-        if (side[a][b - i] === side[a][b]) {
-          break;
-        }
-        ret.push([a, b - i]);
-        if (board[a][b - i]) {
-          break;
-        }
-      }
-    }
-    if (board[a][b] === 'B' || board[a][b] === 'Q') {
+    if(board[a][b] === 'R') break;
+    case 'B':
       var BISHOP_MOVES = [[1, 1], [1, -1], [-1, 1], [-1, -1]];
       for (let j = 0; j < BISHOP_MOVES.length; j++) {
         let m = BISHOP_MOVES[j];
         for (let i = 1; i <= 8; i++) {
           let na = a + m[0] * i;
           let nb = b + m[1] * i;
-          if (!(0 <= na && na < 8 && 0 <= nb && nb < 8)) {
-            break;
-          }
-          if (side[na][nb] === side[a][b]) {
-            break;
-          }
+          if (!isInBoard(na, nb)) break;
+          if (side[na][nb] === side[a][b]) break;
           ret.push([na, nb]);
-          if (board[na][nb] !== '') {
-            break;
-          }
+          if (board[na][nb] !== '') break;
         }
       }
     }
@@ -239,8 +198,7 @@
     var b1 = 8 - parseInt(b[1]);
     var b2 = x(b[0]);
 
-    if (a1 < 0 || b1 < 0 || a1 >= 8 || b1 >= 8
-        || a2 < 0 || b2 < 0 || a2 >= 8 || b2 >= 8) {
+    if (!isInBoard(a1, b1) || !isInBoard(a2, b2)) {
       sendMod('Your move is not on a legal square. Please try again.');
       return false;
     }
@@ -337,7 +295,6 @@
           continue;
 
         if (isThreatened(i, j)) {
-          /* crap our king is threatened */
           board[a1][a2] = board[b1][b2];
           side[a1][a2] = side[b1][b2];
           board[b1][b2] = prev;
@@ -349,32 +306,18 @@
     }
 
     if (board[b1][b2] === 'K') {
-      if (turn == 0) {
-        white_can_castle = false;
-      }
-      if (turn == 1) {
-        black_can_castle = false;
-      }
+      if (turn == 0) white_can_castle = false;
+      if (turn == 1) black_can_castle = false;
     }
 
     if (board[b1][b2] === 'R') {
       if (turn === 0) {
-        // white
-        if (a1 === 7 && a2 === 7) {
-          moved_white_rook[0] = true;
-        }
-        if (a1 === 7 && a2 === 0) {
-          moved_white_rook[1] = true;
-        }
-      }
-      else {
+        if (a2 === 7) moved_white_rook[0] = true;
+        if (a2 === 0) moved_white_rook[1] = true;
+      } else {
         // black
-        if (a1 === 0 && a2 === 7) {
-          moved_black_rook[0] = true;
-        }
-        if (a1 === 0 && a2 === 0) {
-          moved_black_rook[1] = true;
-        }
+        if (a2 === 7) moved_black_rook[0] = true;
+        if (a2 === 0) moved_black_rook[1] = true;
       }
     }
 
