@@ -78,9 +78,9 @@
     w.doInput('[color=black][b]{@chess}[/b] ' + s + '[/color]');
   };
 
-  var inBoard = function(a, b){
+  var inBoard = function(a, b) {
     return 0 <= a && a < 8 && 0 <= b && b < 8;
-  }
+  };
 
   var threatenList = function(a, b) {
     var ret = [];
@@ -106,7 +106,7 @@
             ret.push([a + 2, b]);
           }
         }
-        for (i = b - 1; i <= b + 1; i += 2) {
+        for (let i = b - 1; i <= b + 1; i += 2) {
           if (0 <= i && i < 8 && side[a + 1][i] === 0) {
             ret.push([a + 1, i]);
           }
@@ -139,7 +139,7 @@
     }
 
     if (board[a][b] === 'R' || board[a][b] === 'Q') {
-      var ROOK_MOVES = [[0, 1], [0, -1], [1, 0]], [-1, 0]];
+      var ROOK_MOVES = [[0, 1], [0, -1], [1, 0], [-1, 0]];
       for (let j = 0; j < ROOK_MOVES.length; j++) {
         let m = ROOK_MOVES[j];
         for (let i = 1; i <= 8; i++) {
@@ -176,11 +176,11 @@
       for (let j = 0; j < 8; j++) {
         if (side[i][j] != side[a][b]) {
           var threatened = false;
-          threatenList(i, j).forEach(function(x) {
+          for (let x of threatenList(i, j)) {
             if (x[0] === a && x[1] === b) {
               threatened = true;
             }
-          });
+          }
           if (threatened) {
             return true;
           }
@@ -190,19 +190,36 @@
     return false;
   };
 
-  var parseMove = function(m) {
-    var a, b;
-    [a, b] = m;
+  var parseSquare = function(square) {
+    /* Example of usage: parseSquare('a7') -> [1, 0] */
+    var squareRegex = /^[a-h][1-8]$/;
+    if (squareRegex.test(square)) {
+      var i = 8 - parseInt(square[1]);
+      var j = square.charCodeAt(0) - 'a'.charCodeAt(0);
+      return [i, j];
+    }
+    else {
+      return undefined;
+    }
+  };
 
-    if (a.length != 2 || b.length != 2) {
+  var parseMove = function(m) {
+    /* Example of usage: parseMove(['a7', 'a6']) -> [[1, 0], [2, 0]] */
+    if (m.length != 2) return undefined;
+    var a = parseSquare(m[0]);
+    var b = parseSquare(m[1]);
+    if (a && b) return [a, b];
+    else return undefined;
+  };
+
+  var doMove = function(move) {
+    move = parseMove(move);
+    if (!move) {
       sendMod('Your move is not on a legal square. Please try again.');
       return false;
     }
-    var x = function(s) { return s.charCodeAt(0) - 'a'.charCodeAt(0); };
-    var a1 = 8 - parseInt(a[1]);
-    var a2 = x(a[0]);
-    var b1 = 8 - parseInt(b[1]);
-    var b2 = x(b[0]);
+
+    var [[a1, a2], [b1, b2]] = move;
 
     if (!inBoard(a1, b1) || !inBoard(a2, b2)) {
       sendMod('Your move is not on a legal square. Please try again.');
@@ -210,7 +227,7 @@
     }
 
     if (turn != side[a1][a2]) {
-      sendMod('You cannot move your opponent\'s pieces. Please try again.');
+      sendMod('You cannot move your opponent\'s piece. Please try again.');
       return false;
     }
 
@@ -382,8 +399,8 @@
         }
         else if ((payload.speaker === white && turn === 0) ||
             (payload.speaker === black && turn === 1)) {
-          var r = parseMove(x.slice(1));
-          if (r) {
+          var move = parseMove(x.slice(1));
+          if (doMove(move)) {
             nextTurn();
           }
         }
