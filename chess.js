@@ -2,7 +2,7 @@
  * Authors: Eric Zhang and Jason Chen
  */
 
-!function(ROOM_ID) {
+;(function(ROOM_ID) {
   'use strict';
   /*               0    1    2    3    4    5    6    7          */
   var START_B = [['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'],  /* 0 */
@@ -389,32 +389,42 @@
 
   var _onPluginMessage = Classroom.socket.onPluginMessage;
   Classroom.socket.onPluginMessage = function onPluginMessage(payload) {
-    if (payload['room-id'] == ROOM_ID && payload.message
-        && payload.message.startsWith('@chess')) {
+    if (payload['room-id'] == ROOM_ID && payload.message &&
+        payload.message.startsWith('@chess')) {
       var x = payload.message.split(' ');
       if (playing) {
-        if ((payload.speaker === white || payload.speaker === black)
-            && x[1] === 'stop') {
-          stop();
-        }
-        else if ((payload.speaker === white && turn === 0) ||
-            (payload.speaker === black && turn === 1)) {
-          var move = parseMove(x.slice(1));
-          if (doMove(move)) {
-            nextTurn();
-          }
+        var speakerId = -1;
+        if (payload.speaker === white) speakerId = 0;
+        if (payload.speaker === black) speakerId = 1;
+
+        if (speakerId === -1) {
+          sendMod(payload.speaker + ' is not currently playing and cannot make a move.');
         }
         else {
-          console.log('Illegal turn or action: ' + payload.speaker);
+          if (x[1] === 'stop') {
+            stop();
+          }
+          else if (speakerId === turn) {
+            var move = parseMove(x.slice(1));
+            if (doMove(move)) {
+              nextTurn();
+            }
+          }
+          else {
+            sendMod('Usage when playing: @chess e2 e4; @chess stop.');
+          }
         }
       }
       else {
         if (x[1] === 'play' && x[2]) {
           play(payload.speaker, x[2]);
         }
+        else {
+          sendMod('Usage: @chess play <username>.');
+        }
       }
     }
     _onPluginMessage(payload);
   };
 
-}(prompt('What room ID to use?').toLowerCase());
+})(prompt('What room ID to use?').toLowerCase());
