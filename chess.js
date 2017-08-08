@@ -78,11 +78,11 @@
     w.doInput('[color=black][b]{@chess}[/b] ' + s + '[/color]');
   };
 
-  var isInBoard = function(a, b){
+  var inBoard = function(a, b){
     return 0 <= a && a < 8 && 0 <= b && b < 8;
   }
 
-  var threaten_list = function(a, b) {
+  var threatenList = function(a, b) {
     var ret = [];
 
     if (board[a][b] === 'P') {
@@ -118,7 +118,7 @@
       for (let i = a - 1; i <= a + 1; i++) {
         for (let j = b - 1; j <= b + 1; j++) {
           if (i === a && j === b) continue;
-          if (isInBoard(i, j) && side[i][j] !== side[a][b]) {
+          if (inBoard(i, j) && side[i][j] !== side[a][b]) {
             ret.push([i, j]);
           }
         }
@@ -130,7 +130,7 @@
                           [1, -2], [2, -1], [-1, -2], [-2, -1]];
       for (let i = 0; i < KNIGHT_MOVES.length; i++) {
         let m = KNIGHT_MOVES[i];
-        if (isInBoard(a + m[0], b + m[1])) {
+        if (inBoard(a + m[0], b + m[1])) {
           if (side[a][b] != side[a + m[0]][b + m[1]]) {
             ret.push([a + m[0], b + m[1]]);
           }
@@ -145,7 +145,7 @@
         for (let i = 1; i <= 8; i++) {
           let na = a + m[0] * i;
           let nb = b + m[1] * i;
-          if (!isInBoard(na, nb)) break;
+          if (!inBoard(na, nb)) break;
           if (side[na][nb] === side[a][b]) break;
           ret.push([na, nb]);
           if (board[na][nb] !== '') break;
@@ -160,7 +160,7 @@
         for (let i = 1; i <= 8; i++) {
           let na = a + m[0] * i;
           let nb = b + m[1] * i;
-          if (!isInBoard(na, nb)) break;
+          if (!inBoard(na, nb)) break;
           if (side[na][nb] === side[a][b]) break;
           ret.push([na, nb]);
           if (board[na][nb] !== '') break;
@@ -176,7 +176,7 @@
       for (let j = 0; j < 8; j++) {
         if (side[i][j] != side[a][b]) {
           var threatened = false;
-          threaten_list(i, j).forEach(function(x) {
+          threatenList(i, j).forEach(function(x) {
             if (x[0] === a && x[1] === b) {
               threatened = true;
             }
@@ -204,7 +204,7 @@
     var b1 = 8 - parseInt(b[1]);
     var b2 = x(b[0]);
 
-    if (!isInBoard(a1, b1) || !isInBoard(a2, b2)) {
+    if (!inBoard(a1, b1) || !inBoard(a2, b2)) {
       sendMod('Your move is not on a legal square. Please try again.');
       return false;
     }
@@ -277,7 +277,7 @@
     }
 
     /* Check that you can move the piece in that direction via. basic chess rules */
-    var good = threaten_list(a1, a2);
+    var good = threatenList(a1, a2);
     var inList = false;
     for (let i = 0; i < good.length; i++) {
       if (good[i][0] === b1 && good[i][1] === b2) {
@@ -318,7 +318,6 @@
     }
 
     /* State updates after the move has been finalized */
-
     if (board[b1][b2] === 'K') {
       if (turn === 0) white_can_castle = false;
       if (turn === 1) black_can_castle = false;
@@ -389,7 +388,7 @@
           }
         }
         else {
-          console.log('WRONG TURN OR ACTION: ' + payload.speaker);
+          console.log('Illegal turn or action: ' + payload.speaker);
         }
       }
       else {
