@@ -1,14 +1,18 @@
+/* Bookmarklet for playing chess in the AoPS Classroom.
+ * Authors: Eric Zhang and Jason Chen
+ */
+
 !function(ROOM_ID) {
   'use strict';
-  //               0    1    2    3    4    5    6    7
-  var START_B = [['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'], // 0
-                 ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'], // 1
-                 ['' , '' , '' , '' , '' , '' , '' , '' ], // 2
-                 ['' , '' , '' , '' , '' , '' , '' , '' ], // 3
-                 ['' , '' , '' , '' , '' , '' , '' , '' ], // 4
-                 ['' , '' , '' , '' , '' , '' , '' , '' ], // 5
-                 ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'], // 6
-                 ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']]; // 7
+  /*               0    1    2    3    4    5    6    7          */
+  var START_B = [['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'],  /* 0 */
+                 ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],  /* 1 */
+                 ['' , '' , '' , '' , '' , '' , '' , '' ],  /* 2 */
+                 ['' , '' , '' , '' , '' , '' , '' , '' ],  /* 3 */
+                 ['' , '' , '' , '' , '' , '' , '' , '' ],  /* 4 */
+                 ['' , '' , '' , '' , '' , '' , '' , '' ],  /* 5 */
+                 ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],  /* 6 */
+                 ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']]; /* 7 */
   var START_S = [[ 1,  1,  1,  1,  1,  1,  1,  1],
                  [ 1,  1,  1,  1,  1,  1,  1,  1],
                  [-1, -1, -1, -1, -1, -1, -1, -1],
@@ -81,8 +85,7 @@
   var threaten_list = function(a, b) {
     var ret = [];
 
-    switch(board[a][b]){
-    case 'P':
+    if (board[a][b] === 'P') {
       if (side[a][b] === 0) {
         if (board[a - 1][b] === '') {
           ret.push([a - 1, b]);
@@ -95,7 +98,8 @@
             ret.push([a - 1, i]);
           }
         }
-      } else {
+      }
+      else {
         if (board[a + 1][b] === '') {
           ret.push([a + 1, b]);
           if (a === 1 && board[a + 2][b] === '') {
@@ -108,8 +112,9 @@
           }
         }
       }
-      break;
-    case 'K':
+    }
+
+    if (board[a][b] === 'K') {
       for (let i = a - 1; i <= a + 1; i++) {
         for (let j = b - 1; j <= b + 1; j++) {
           if (i === a && j === b) continue;
@@ -118,10 +123,11 @@
           }
         }
       }
-      break;
-    case 'N':
+    }
+
+    if (board[a][b] === 'N') {
       var KNIGHT_MOVES = [[1, 2], [2, 1], [-1, 2], [-2, 1],
-            [1, -2], [2, -1], [-1, -2], [-2, -1]];
+                          [1, -2], [2, -1], [-1, -2], [-2, -1]];
       for (let i = 0; i < KNIGHT_MOVES.length; i++) {
         let m = KNIGHT_MOVES[i];
         if (isInBoard(a + m[0], b + m[1])) {
@@ -130,9 +136,9 @@
           }
         }
       }
-    break;
-    case 'Q':
-    case 'R':
+    }
+
+    if (board[a][b] === 'R' || board[a][b] === 'Q') {
       var ROOK_MOVES = [[0, 1], [0, -1], [1, 0]], [-1, 0]];
       for (let j = 0; j < ROOK_MOVES.length; j++) {
         let m = ROOK_MOVES[j];
@@ -145,8 +151,9 @@
           if (board[na][nb] !== '') break;
         }
       }
-    if(board[a][b] === 'R') break;
-    case 'B':
+    }
+
+    if (board[a][b] === 'B' || board[a][b] === 'Q') {
       var BISHOP_MOVES = [[1, 1], [1, -1], [-1, 1], [-1, -1]];
       for (let j = 0; j < BISHOP_MOVES.length; j++) {
         let m = BISHOP_MOVES[j];
@@ -160,6 +167,7 @@
         }
       }
     }
+
     return ret;
   };
 
@@ -184,7 +192,6 @@
   };
 
   var parseMove = function(m) {
-    /* this is a basic variant, no checking yet */
     var a, b;
     [a, b] = m;
 
@@ -208,10 +215,11 @@
       return false;
     }
 
-    // TODO: fix castling bug?!
-    if (turn === 0 && white_can_castle) { // white castle
+    /* White castle */
+    if (turn === 0 && white_can_castle) {
       if (a1 === 7 && a2 === 4 && board[7][4] === 'K' && side[7][4] === 0) {
-        if (!moved_white_rook[0] && b1 === 7 && b2 === 6 && // white kingside castle
+        /* White kingside castle */
+        if (!moved_white_rook[0] && b1 === 7 && b2 === 6 &&
             board[7][7] === 'R' && board[7][6] === '' && board[7][5] === '') {
           if (!isThreatened(7, 4) && !isThreatened(7, 5) && !isThreatened(7, 6)) {
             board[7][6] = 'K'; side[7][6] = 0;
@@ -222,7 +230,8 @@
             return true;
           }
         }
-        if (!moved_white_rook[1] && b1 === 7 && b2 === 2 && // white queenside castle
+        /* White queenside castle */
+        if (!moved_white_rook[1] && b1 === 7 && b2 === 2 &&
             board[7][0] === 'R' && board[7][1] === '' &&
             board[7][2] === '' && board[7][3] === '') {
           if (!isThreatened(7, 4) && !isThreatened(7, 3) && !isThreatened(7, 2)) {
@@ -237,9 +246,11 @@
       }
     }
 
-    if (turn === 1 && black_can_castle) { // black castle
+    /* Black castle */
+    if (turn === 1 && black_can_castle) {
       if (a1 === 0 && a2 === 4 && board[0][4] === 'K' && side[0][4] === 1) {
-        if (!moved_black_rook[0] && b1 === 0 && b2 === 6 && // black kingside castle
+        /* Black kingside castle */
+        if (!moved_black_rook[0] && b1 === 0 && b2 === 6 &&
             board[0][7] === 'R' && board[0][6] === '' && board[0][5] === '') {
           if (!isThreatened(0, 4) && !isThreatened(0, 5) && !isThreatened(0, 6)) {
             board[0][6] = 'K'; side[0][6] = 1;
@@ -250,7 +261,8 @@
             return true;
           }
         }
-        if (!moved_black_rook[1] && b1 === 0 && b2 === 2 && // black queenside castle
+        /* Black queenside castle */
+        if (!moved_black_rook[1] && b1 === 0 && b2 === 2 &&
             board[0][0] === 'R' && board[0][1] === '' &&
             board[0][2] === '' && board[0][3] === '') {
           if (!isThreatened(0, 4) && !isThreatened(0, 3) && !isThreatened(0, 2)) {
@@ -306,22 +318,22 @@
     }
 
     if (board[b1][b2] === 'K') {
-      if (turn == 0) white_can_castle = false;
-      if (turn == 1) black_can_castle = false;
+      if (turn === 0) white_can_castle = false;
+      if (turn === 1) black_can_castle = false;
     }
 
     if (board[b1][b2] === 'R') {
       if (turn === 0) {
-        if (a2 === 7) moved_white_rook[0] = true;
-        if (a2 === 0) moved_white_rook[1] = true;
-      } else {
-        // black
-        if (a2 === 7) moved_black_rook[0] = true;
-        if (a2 === 0) moved_black_rook[1] = true;
+        if (a2 === 7 && a1 == 7) moved_white_rook[0] = true;
+        if (a2 === 0 && a1 == 7) moved_white_rook[1] = true;
+      }
+      else {
+        if (a2 === 7 && a1 == 0) moved_black_rook[0] = true;
+        if (a2 === 0 && a1 == 0) moved_black_rook[1] = true;
       }
     }
 
-    if (board[b1][b2] === 'P' && (b1 == 0 || b1 == 7)) {
+    if (board[b1][b2] === 'P' && (b1 === 0 || b1 === 7)) {
       board[b1][b2] = 'Q';
     }
 
