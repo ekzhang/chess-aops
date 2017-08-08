@@ -42,7 +42,7 @@
   }, 1100);
 
   var sendFEN = function(s) {
-    /* this is the hacky API call */
+    /* Hacky API call to an online FEN -> chess diagram service. */
     var poslink = 'http://www.gilith.com/chess/diagrams/?f=' + s.replace(/\//g, '%2F') + '&s=create';
     var imglink = 'http://www.gilith.com/chess/diagrams/images/' + s.replace(/\//g, '_') + '.png';
     $('<iframe src="' + poslink + '">').appendTo('body').load(function() {
@@ -175,14 +175,13 @@
     for (let i = 0; i < 8; i++) {
       for (let j = 0; j < 8; j++) {
         if (side[i][j] != side[a][b]) {
-          var fail = false;
+          var threatened = false;
           threaten_list(i, j).forEach(function(x) {
             if (x[0] === a && x[1] === b) {
-              /* oops someone's threatening the (a, b) square */
-              fail = true;
+              threatened = true;
             }
           });
-          if (fail) {
+          if (threatened) {
             return true;
           }
         }
@@ -277,7 +276,7 @@
       }
     }
 
-    /* basic check that you can move the piece there by chess rules */
+    /* Check that you can move the piece in that direction via. basic chess rules */
     var good = threaten_list(a1, a2);
     var inList = false;
     for (let i = 0; i < good.length; i++) {
@@ -291,6 +290,7 @@
       return false;
     }
 
+    /* Make the move */
     var prev = board[b1][b2];
     var prev_side = side[b1][b2];
 
@@ -299,10 +299,10 @@
     board[a1][a2] = '';
     side[a1][a2] = -1;
 
-    /* make sure we don't put/leave ourself in check illegally */
+    /* Make sure that we don't aren't in check after the move */
     for (let i = 0; i < 8; i++) {
       for (let j = 0; j < 8; j++) {
-        /* find the actual king */
+        /* Find our king */
         if (board[i][j] != 'K' || side[i][j] != turn)
           continue;
 
@@ -316,6 +316,8 @@
         }
       }
     }
+
+    /* State updates after the move has been finalized */
 
     if (board[b1][b2] === 'K') {
       if (turn === 0) white_can_castle = false;
