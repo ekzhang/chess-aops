@@ -1,0 +1,1 @@
+javascript:void(document.body.appendChild(document.createElement('script')).src='//raw.githubusercontent.com/ekzhang/chess-aops/master/chess.js');

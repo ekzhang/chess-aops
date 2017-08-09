@@ -1,4 +1,4 @@
-/* Bookmarklet for playing chess in the AoPS Classroom.
+/* Code for a chess game bot in the AoPS Classroom.
  * Authors: Eric Zhang and Jason Chen
  */
 
