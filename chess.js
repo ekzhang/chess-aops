@@ -177,7 +177,7 @@
   var isThreatened = function(a, b) {
     for (let i = 0; i < 8; i++) {
       for (let j = 0; j < 8; j++) {
-        if (side[i][j] != side[a][b]) {
+        if (side[i][j] != turn) {
           var threatened = false;
           for (let x of threatenList(i, j)) {
             if (x[0] === a && x[1] === b) {
@@ -394,11 +394,11 @@
   Classroom.socket.onPluginMessage = function onPluginMessage(payload) {
     if (payload['room-id'] == ROOM_ID && payload.message &&
         payload.message.startsWith('@chess')) {
-      var x = payload.message.split(' ');
+      var x = payload.message.split('<')[0].split(' ');
       if (playing) {
         var speakerId = -1;
         if (payload.speaker === white) speakerId = 0;
-        if (payload.speaker === black) speakerId = 1;
+        if (payload.speaker === black && (speakerId === -1 || turn === 1)) speakerId = 1;
 
         if (speakerId === -1) {
           sendMod(payload.speaker + ' is not currently playing and cannot make a move.');
