@@ -343,16 +343,10 @@
       if (turn === 1) black_can_castle = false;
     }
 
-    if (board[b1][b2] === 'R') {
-      if (turn === 0) {
-        if (a2 === 7 && a1 == 7) moved_white_rook[0] = true;
-        if (a2 === 0 && a1 == 7) moved_white_rook[1] = true;
-      }
-      else {
-        if (a2 === 7 && a1 == 0) moved_black_rook[0] = true;
-        if (a2 === 0 && a1 == 0) moved_black_rook[1] = true;
-      }
-    }
+    if (a2 === 7 && a1 == 7) moved_white_rook[0] = true;
+    if (a2 === 0 && a1 == 7) moved_white_rook[1] = true;
+    if (a2 === 7 && a1 == 0) moved_black_rook[0] = true;
+    if (a2 === 0 && a1 == 0) moved_black_rook[1] = true;
 
     if (board[b1][b2] === 'P' && (b1 === 0 || b1 === 7)) {
       board[b1][b2] = 'Q';
