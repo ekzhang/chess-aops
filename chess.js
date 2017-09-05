@@ -38,9 +38,10 @@
     q.push(s);
   };
   setInterval(function() {
+    if (q.length === 0) return;
     var unique_str = q.shift();
     unique_str += '[color=transparent]' + new Date().toLocaleTimeString() + '[/color]';
-    if (q.length > 0) _doInput(unique_str);
+    _doInput(unique_str);
   }, 1100);
 
   var sendFEN = function(s) {
