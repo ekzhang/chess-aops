@@ -405,7 +405,7 @@
             stop();
           }
           else if (speakerId === turn) {
-            var move = parseMove(x.slice(1));
+            var move = x.slice(1);
             if (doMove(move)) {
               nextTurn();
             }
